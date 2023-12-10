@@ -1,3 +1,4 @@
+use std::fmt;
 use std::hash::{Hash, Hasher};
 use std::ops::Add;
 
@@ -36,6 +37,24 @@ impl Pipe {
             SouthWest => [South, West],
             SouthEast => [South, East],
         }
+    }
+}
+
+impl fmt::Display for Pipe {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        use Pipe::*;
+        write!(
+            f,
+            "{}",
+            match self {
+                NorthSouth => '|',
+                EastWest => '—',
+                NorthEast => 'L',
+                NorthWest => 'J',
+                SouthWest => '7',
+                SouthEast => 'F',
+            }
+        )
     }
 }
 
