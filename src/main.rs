@@ -64,15 +64,6 @@ fn solve(input: &str) -> usize {
                     Some(pos) => pos,
                     _ => continue,
                 };
-                // if !is_valid_position(adj) {
-                //     continue;
-                // }
-                // let tile = positions.get(&adj).unwrap();
-                // if let Tile::Connector(pipe) = tile {
-                //     if pipe.get_directions().contains(&direction.get_opposite()) {
-                //         new_nodes.push(adj);
-                //     }
-                // }
                 new_nodes.push(adj);
             }
         }
