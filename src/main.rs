@@ -1,5 +1,5 @@
 use p10::*;
-use std::collections::HashMap;
+use std::collections::{HashMap, HashSet};
 
 fn solve(input: &str) -> usize {
     println!();
@@ -32,6 +32,7 @@ fn solve(input: &str) -> usize {
         Direction::South,
     ];
     let mut relevant_adj_nodes = Vec::new();
+    let mut start_directions = Vec::new();
     for direction in directions {
         let position_adj_to_animal = match animal_position + direction {
             Some(pos) => pos,
@@ -43,12 +44,13 @@ fn solve(input: &str) -> usize {
         let tile = positions.get(&position_adj_to_animal).unwrap();
         if let Tile::Connector(pipe) = tile {
             if pipe.get_directions().contains(&direction.get_opposite()) {
+                start_directions.push(direction);
                 relevant_adj_nodes.push(position_adj_to_animal);
             }
         }
     }
     assert_eq!(relevant_adj_nodes.len(), 2);
-    let mut nodes = relevant_adj_nodes;
+    let mut nodes = relevant_adj_nodes.clone();
     let mut pipe_nodes = vec![(nodes[0], nodes[1])];
     while nodes[0] != nodes[1] {
         let mut new_nodes = Vec::new();
@@ -80,6 +82,9 @@ fn solve(input: &str) -> usize {
                 .chain(finish_rev.into_iter().skip(1).rev()),
         )
         .collect();
+    let start_node = Tile::Connector(Pipe::from_directions(&start_directions));
+    positions.remove(&animal_position);
+    positions.insert(animal_position, start_node);
     let mut inside;
     let mut inside_count = 0;
     for row in 0..nrows {

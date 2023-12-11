@@ -26,6 +26,20 @@ impl Pipe {
         }
     }
 
+    pub fn from_directions(directions: &[Direction]) -> Self {
+        use Direction::*;
+        use Pipe::*;
+        match directions {
+            [North, South] | [South, North] => NorthSouth,
+            [East, West] | [West, East] => EastWest,
+            [North, East] | [East, North] => NorthEast,
+            [North, West] | [West, North] => NorthWest,
+            [South, West] | [West, South] => SouthWest,
+            [South, East] | [East, South] => SouthEast,
+            _ => panic!("invalid directions"),
+        }
+    }
+
     pub fn get_directions(&self) -> [Direction; 2] {
         use Direction::*;
         use Pipe::*;
