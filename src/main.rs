@@ -76,11 +76,7 @@ fn solve(input: &str) -> usize {
     }
     let (start, finish_rev): (Vec<_>, Vec<_>) = pipe_nodes.into_iter().unzip();
     let start_to_finish: Vec<_> = std::iter::once(animal_position)
-        .chain(
-            start
-                .into_iter()
-                .chain(finish_rev.into_iter().skip(1).rev()),
-        )
+        .chain(start.into_iter().chain(finish_rev.into_iter().rev()))
         .collect();
     let start_node = Tile::Connector(Pipe::from_directions(&start_directions));
     positions.remove(&animal_position);
@@ -96,13 +92,16 @@ fn solve(input: &str) -> usize {
                 from: None,
             };
             if start_to_finish.contains(&pos) {
+                println!("start to finish contains row {row} col {col}");
                 let tile = positions.get(&pos).unwrap();
                 if let Tile::Connector(pipe) = tile {
                     if pipe.get_directions().contains(&Direction::North) {
+                        println!("flipping inside at row {row} col {col}");
                         inside = !inside;
                     }
                 }
             } else if inside {
+                println!("incrementing inside count at row {row} col {col}");
                 inside_count += 1;
             }
         }
@@ -159,6 +158,17 @@ L---JF-JLJ.||-FJLJJ7
 L.L7LFJ|||||FJL7||LJ
 L7JLJL-JLJLJL--JLJ.L";
         assert_eq!(solve(input), 10);
+    }
+
+    #[test]
+    fn example4() {
+        let input = "\
+.........
+...F-7...
+...S.|...
+...L-J...
+.........";
+        assert_eq!(solve(input), 1);
     }
 }
 
