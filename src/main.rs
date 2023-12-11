@@ -1,5 +1,5 @@
 use p10::*;
-use std::collections::{HashMap, HashSet};
+use std::collections::HashMap;
 
 fn solve(input: &str) -> usize {
     println!();
@@ -48,7 +48,6 @@ fn solve(input: &str) -> usize {
         }
     }
     assert_eq!(relevant_adj_nodes.len(), 2);
-    let mut steps = 1;
     let mut nodes = relevant_adj_nodes;
     let mut pipe_nodes = vec![(nodes[0], nodes[1])];
     while nodes[0] != nodes[1] {
@@ -72,7 +71,6 @@ fn solve(input: &str) -> usize {
         assert_eq!(new_nodes.len(), 2);
         nodes = new_nodes;
         pipe_nodes.push((nodes[0], nodes[1]));
-        steps += 1;
     }
     let (start, finish_rev): (Vec<_>, Vec<_>) = pipe_nodes.into_iter().unzip();
     let start_to_finish: Vec<_> = std::iter::once(animal_position)
@@ -82,34 +80,29 @@ fn solve(input: &str) -> usize {
                 .chain(finish_rev.into_iter().skip(1).rev()),
         )
         .collect();
-    let npipes = start_to_finish.len();
-    println!("npipes {npipes}");
-    let mut vertices = Vec::new();
-    for pos in start_to_finish.iter() {
-        if pos == &animal_position {
-            vertices.push(pos);
-            continue;
-        }
-        let tile = positions.get(&pos).unwrap();
-        if let Tile::Connector(pipe) = tile {
-            match pipe {
-                Pipe::NorthSouth | Pipe::EastWest => (),
-                _ => vertices.push(pos),
+    let mut inside;
+    let mut inside_count = 0;
+    for row in 0..nrows {
+        inside = false;
+        for col in 0..ncols {
+            let pos = Position {
+                row,
+                col,
+                from: None,
+            };
+            if start_to_finish.contains(&pos) {
+                let tile = positions.get(&pos).unwrap();
+                if let Tile::Connector(pipe) = tile {
+                    if pipe.get_directions().contains(&Direction::North) {
+                        inside = !inside;
+                    }
+                }
+            } else if inside {
+                inside_count += 1;
             }
         }
     }
-    let nvertices = vertices.len();
-    println!("nvertices: {nvertices}");
-    println!("{vertices:?}");
-    let mut area = 0;
-    for i in 0..nvertices {
-        let j = (i + 1) % nvertices;
-        area += ((ncols - vertices[i].col) * vertices[j].row) as isize;
-        area -= ((ncols - vertices[j].col) * vertices[i].row) as isize;
-    }
-    area = area.abs() / 2;
-    println!("area is {area}");
-    (area + 1) as usize - start_to_finish.len() / 2
+    inside_count
 }
 
 #[cfg(test)]
